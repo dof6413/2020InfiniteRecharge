@@ -24,6 +24,10 @@ import com.revrobotics.ColorSensorV3;
 import com.revrobotics.ColorSensorV3.RawColor;
 import com.revrobotics.ColorMatchResult;
 import com.revrobotics.ColorMatch;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
+
 //import frc.robot.Constants;
 
 /**
@@ -33,6 +37,9 @@ import com.revrobotics.ColorMatch;
  * project.
  */
 public class Robot extends TimedRobot {
+  double desiredDistance = 120;
+  NetworkTableEntry xEntry;
+  NetworkTableEntry yEntry;
   private static final int kEncoderPortA = 0;
   private static final int kEncoderPortB = 1;
   private Encoder m_encoder;
@@ -79,16 +86,28 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotInit() {
+     //Get the default instance of NetworkTables that was created automatically
+       //when your program starts
+       NetworkTableInstance inst = NetworkTableInstance.getDefault();
+        //Get the table within that instance that contains the data. There can
+       //be as many tables as you like and exist to make it easier to organize
+       //your data. In this case, it's a table called datatable.
+       NetworkTable table = inst.getTable("datatable");
+
+       //Get the entries within that table that correspond to the X and Y values
+       //for some operation in your program.
+       xEntry = table.getEntry("X");
+       yEntry = table.getEntry("Y");
     m_leftfollow.follow(m_leftMotor);
     m_rightfollow.follow(m_rightMotor);
     m_encoder = new Encoder(kEncoderPortA, kEncoderPortB);
     m_encoder2 = new Encoder(kEncoderPortC, kEncoderPortD);
+
     // Use SetDistancePerPulse to set the multiplier for GetDistance
     // This is set up assuming a 6 inch wheel with a 360 CPR encoder.
+
     m_encoder.setDistancePerPulse((Math.PI * 6) / 360.0);
-    m_encoder2.setDistancePerPulse((Math.PI * 6) / 360.0);
-
-
+    m_encoder2.setDistancePerPulse((Math.PI * 6) / 360.0);  
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
@@ -97,8 +116,11 @@ public class Robot extends TimedRobot {
     m_colorMatcher.addColorMatch(kGreenTarget);
     m_colorMatcher.addColorMatch(kRedTarget);
     m_colorMatcher.addColorMatch(kYellowTarget);    
+
  
   }
+  double x = 0;
+  double y = 0;
 
   /**
    * This function is called every robot packet, no matter the mode. Use this for items like
@@ -148,29 +170,7 @@ public class Robot extends TimedRobot {
     boolean booleanGreen = false;
     boolean booleanBlue = false;
     boolean booleanYellow = false;
-    if (match.color == kBlueTarget){
-     // m_robotDrive.arcadeDrive(0.5, 0.0); 
-      colorString = "Blue";
-      booleanBlue =true;
-    }else if (match.color == kRedTarget){
-      colorString = "Red";
-     // m_robotDrive.stopMotor();
-      booleanRed = true;
-    }else if (match.color == kGreenTarget){
-      //m_robotDrive.arcadeDrive(0.5, 0.0); 
-      colorString = "Green";
-      booleanGreen = true;}
-    else if (match.color == kYellowTarget){
-     // m_robotDrive.stopMotor();
-      colorString = "Yellow";
-      booleanYellow = true;}
-    else {
-      colorString = "unknown";
-    }
-    SmartDashboard.putBoolean("isRed", booleanRed);
-    SmartDashboard.putBoolean("isBlue", booleanBlue);
-    SmartDashboard.putBoolean("isYellow", booleanYellow);
-    SmartDashboard.putBoolean("isGreen", booleanGreen);
+
     /**
      * In addition to RGB IR values, the color sensor can also return an 
      * infrared proximity value. The chip contains an IR led which will emit
@@ -185,8 +185,8 @@ public class Robot extends TimedRobot {
     int proximity = m_colorSensor.getProximity();
 
     SmartDashboard.putNumber("Proximity", proximity);
-
-
+    String egg;
+    egg = "";
     String gameData;
 gameData = DriverStation.getInstance().getGameSpecificMessage();
 if(gameData.length() > 0)
@@ -196,18 +196,22 @@ if(gameData.length() > 0)
     case 'B' :
       //Blue case code
       SmartDashboard.putString("FMS Color", "Blue");
+      egg="Blue";
       break;
     case 'G' :
       //Green case code
       SmartDashboard.putString("FMS Color", "Green");
+      egg="Green";
       break;
     case 'R' :
       //Red case code 
       SmartDashboard.putString("FMS Color", "Red");
+      egg="Red";
       break;
     case 'Y' :
       //Yellow case code
       SmartDashboard.putString("FMS Color", "Yellow");
+      egg="Yellow";
       break;
     default :
       //This is corrupt data
@@ -216,7 +220,56 @@ if(gameData.length() > 0)
 } else {
   //Code for no data received yet
 }
-
+if (m_stick.getXButtonPressed()) {
+  // drive forwards half speed
+  if (match.color == kBlueTarget){
+    // m_robotDrive.arcadeDrive(0.5, 0.0); 
+     colorString = "Blue";
+     booleanBlue =true;
+     if (egg != "Blue"){
+      m_robotDrive.arcadeDrive(0.5, 0.0); 
+     }else {
+      m_robotDrive.stopMotor();
+     }
+   }else if (match.color == kRedTarget){
+     colorString = "Red";
+    // m_robotDrive.stopMotor();
+     booleanRed = true;
+     if (egg != "Red"){
+      m_robotDrive.arcadeDrive(0.5, 0.0); 
+     }else {
+      m_robotDrive.stopMotor();
+     }
+   }else if (match.color == kGreenTarget){
+     //m_robotDrive.arcadeDrive(0.5, 0.0); 
+     colorString = "Green";
+     booleanGreen = true;   
+     if (egg != "Green"){
+      m_robotDrive.arcadeDrive(0.5, 0.0); 
+     }else {
+      m_robotDrive.stopMotor();
+     }
+    }
+   else if (match.color == kYellowTarget){
+    // m_robotDrive.stopMotor();
+     colorString = "Yellow";
+     booleanYellow = true;   
+     if (egg != "Yellow"){
+      m_robotDrive.arcadeDrive(0.5, 0.0); 
+     }else {
+      m_robotDrive.stopMotor();
+     }
+    }
+   else {
+     colorString = "unknown";
+   }
+} else {
+  m_robotDrive.stopMotor(); // stop robot
+}
+ SmartDashboard.putBoolean("isRed", booleanRed);
+ SmartDashboard.putBoolean("isBlue", booleanBlue);
+ SmartDashboard.putBoolean("isYellow", booleanYellow);
+ SmartDashboard.putBoolean("isGreen", booleanGreen);
   }
   
 
@@ -236,6 +289,7 @@ if(gameData.length() > 0)
    */
   @Override
   public void autonomousInit() {
+    m_encoder.reset();
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
     // schedule the autonomous command (example)
@@ -249,10 +303,17 @@ if(gameData.length() > 0)
    */
   @Override
   public void autonomousPeriodic() {
+
+    System.out.print("distance: "+m_encoder.getDistance());
    // Drive for 2 seconds
-   if (m_timer.get() < 2.0) {
+  // if (m_timer.get() < 2.0) {
+    if (m_encoder.getDistance() < desiredDistance) {
+      m_robotDrive.arcadeDrive(0.5, 0.0);
+    }
+    /*
+    if(){
     m_robotDrive.arcadeDrive(0.5, 0.0); // drive forwards half speed
-  } else {
+    } */ else {
     m_robotDrive.stopMotor(); // stop robot
   }
   }
@@ -266,6 +327,7 @@ if(gameData.length() > 0)
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
+
   }
 
   /**
@@ -273,12 +335,16 @@ if(gameData.length() > 0)
    */
   @Override
   public void teleopPeriodic() {
+     //Using the entry objects, set the value to a double that is constantly
+       //increasing. The keys are actually "/datatable/X" and "/datatable/Y".
+       //If they don't already exist, the key/value pair is added.
+       xEntry.setDouble(x);
+       yEntry.setDouble(y);
+       x += 0.05;
+       y += 1.0;
     m_robotDrive.arcadeDrive(m_stick.getY(), m_stick.getX());
-   /* if (m_stick.getXButton()) {
-      m_robotDrive.arcadeDrive(0.5, 0.0); // drive forwards half speed
-    } else {
-      m_robotDrive.stopMotor(); // stop robot
-    }
+   
+    /*
         if (m_stick.getYButton()) {
       m_robotDrive.arcadeDrive(0.5, 0.0); // drive forwards half speed
     } else {
