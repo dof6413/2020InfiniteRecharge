@@ -27,6 +27,8 @@ import com.revrobotics.ColorMatch;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import frc.robot.subsystems.ExampleSubsystem;
+import frc.robot.subsystems.WheelOfFortune;
 
 //import frc.robot.Constants;
 
@@ -40,46 +42,46 @@ public class Robot extends TimedRobot {
   double desiredDistance = 120;
   NetworkTableEntry xEntry;
   NetworkTableEntry yEntry;
-  private static final int kEncoderPortA = 0;
+  /*private static final int kEncoderPortA = 0;
   private static final int kEncoderPortB = 1;
   private Encoder m_encoder;
   private static final int kEncoderPortC = 2;
   private static final int kEncoderPortD = 3;
-  private Encoder m_encoder2;
+  private Encoder m_encoder2;*/
   private Command m_autonomousCommand;
   // private final DifferentialDrive m_robotDrive = new DifferentialDrive(new WPI_VictorSPX(3), new WPI_VictorSPX(4));
     // drive motors
-    private final WPI_VictorSPX m_leftMotor = new WPI_VictorSPX(5);
+    /*private final WPI_VictorSPX m_leftMotor = new WPI_VictorSPX(5);
     private final WPI_VictorSPX m_rightMotor = new WPI_VictorSPX(3);
     private final WPI_VictorSPX m_leftfollow = new WPI_VictorSPX(2);
     private final WPI_VictorSPX m_rightfollow = new WPI_VictorSPX(4);
     private final DifferentialDrive m_robotDrive = new DifferentialDrive(m_leftMotor, m_rightMotor);
-    private final XboxController m_stick = new XboxController(0);
+    private final XboxController m_stick = new XboxController(0);*/
 /**
    * Change the I2C port below to match the connection of your color sensor
    */
-    private final I2C.Port i2cPort = I2C.Port.kOnboard;
+   // private final I2C.Port i2cPort = I2C.Port.kOnboard;
   /**
    * A Rev Color Sensor V3 object is constructed with an I2C port as a 
    * parameter. The device will be automatically initialized with default 
    * parameters.
    */
-    private final ColorSensorV3 m_colorSensor = new ColorSensorV3(i2cPort);
+  //  private final ColorSensorV3 m_colorSensor = new ColorSensorV3(i2cPort);
   
  // public static class ColorSensorV3.RawColor
-    private final ColorMatch m_colorMatcher = new ColorMatch();
+   // private final ColorMatch m_colorMatcher = new ColorMatch();
     private final Timer m_timer = new Timer();
     private RobotContainer m_robotContainer;
 
    /**
   * Note: Any example colors should be calibrated as the user needs, these
   * are here as a basic example.
-  */
+  *//*
     private final Color kBlueTarget = ColorMatch.makeColor(0.143, 0.427, 0.429);
     private final Color kGreenTarget = ColorMatch.makeColor(0.197, 0.561, 0.240);
     private final Color kRedTarget = ColorMatch.makeColor(0.561, 0.232, 0.114);
     private final Color kYellowTarget = ColorMatch.makeColor(0.361, 0.524, 0.113);
-
+*/
     /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
@@ -98,25 +100,25 @@ public class Robot extends TimedRobot {
        //for some operation in your program.
        xEntry = table.getEntry("X");
        yEntry = table.getEntry("Y");
-    m_leftfollow.follow(m_leftMotor);
-    m_rightfollow.follow(m_rightMotor);
-    m_encoder = new Encoder(kEncoderPortA, kEncoderPortB);
-    m_encoder2 = new Encoder(kEncoderPortC, kEncoderPortD);
+    ///m_leftfollow.follow(m_leftMotor);
+    //m_rightfollow.follow(m_rightMotor);
+   // m_encoder = new Encoder(kEncoderPortA, kEncoderPortB);
+   // m_encoder2 = new Encoder(kEncoderPortC, kEncoderPortD);
 
     // Use SetDistancePerPulse to set the multiplier for GetDistance
     // This is set up assuming a 6 inch wheel with a 360 CPR encoder.
 
-    m_encoder.setDistancePerPulse((Math.PI * 6) / 360.0);
-    m_encoder2.setDistancePerPulse((Math.PI * 6) / 360.0);  
+   // m_encoder.setDistancePerPulse((Math.PI * 6) / 360.0);
+ //   m_encoder2.setDistancePerPulse((Math.PI * 6) / 360.0);  
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
-
+/*
     m_colorMatcher.addColorMatch(kBlueTarget);
     m_colorMatcher.addColorMatch(kGreenTarget);
     m_colorMatcher.addColorMatch(kRedTarget);
     m_colorMatcher.addColorMatch(kYellowTarget);    
-
+*/
  
   }
   double x = 0;
@@ -131,8 +133,8 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotPeriodic() {
-    SmartDashboard.putNumber("Encoder", m_encoder.getDistance());
-    SmartDashboard.putNumber("Encoder2", m_encoder2.getDistance());
+    //SmartDashboard.putNumber("Encoder", m_encoder.getDistance());
+    //SmartDashboard.putNumber("Encoder2", m_encoder2.getDistance());
     // Runs the Scheduler.  This is responsible for polling buttons, adding newly-scheduled
     // commands, running already-scheduled commands, removing finished or interrupted commands,
     // and running subsystem periodic() methods.  This must be called from the robot's periodic
@@ -149,15 +151,16 @@ public class Robot extends TimedRobot {
      * an object is the more light from the surroundings will bleed into the 
      * measurements and make it difficult to accurately determine its color.
      */
+    /*
     String colorString;
     Color detectedColor = m_colorSensor.getColor();
     RawColor detectedRawColor = m_colorSensor.getRawColor();
     ColorMatchResult match = m_colorMatcher.matchClosestColor(detectedColor);
-
+*/
     /**
      * The sensor returns a raw IR value of the infrared light detected.
      */
-    double IR = m_colorSensor.getIR();
+    //double IR = m_colorSensor.getIR();
 
     /**
      * Open Smart Dashboard or Shuffleboard to see the color detected by the 
@@ -166,10 +169,10 @@ public class Robot extends TimedRobot {
     //Color detectedrawcolor = GetRawColor(detectedColor);
     //SmartDashboard.putNumber("Leslie", detectedColor.getRawColor());
  
-    boolean booleanRed = false;
+/*    boolean booleanRed = false;
     boolean booleanGreen = false;
     boolean booleanBlue = false;
-    boolean booleanYellow = false;
+    boolean booleanYellow = false;*/
 
     /**
      * In addition to RGB IR values, the color sensor can also return an 
@@ -182,7 +185,7 @@ public class Robot extends TimedRobot {
      * or provide a threshold for when an object is close enough to provide
      * accurate color values.
      */
-    int proximity = m_colorSensor.getProximity();
+   /* int proximity = m_colorSensor.getProximity();
 
     SmartDashboard.putNumber("Proximity", proximity);
     String egg;
@@ -220,56 +223,38 @@ if(gameData.length() > 0)
 } else {
   //Code for no data received yet
 }
-if (m_stick.getXButtonPressed()) {
+
+
   // drive forwards half speed
   if (match.color == kBlueTarget){
     // m_robotDrive.arcadeDrive(0.5, 0.0); 
      colorString = "Blue";
      booleanBlue =true;
-     if (egg != "Blue"){
-      m_robotDrive.arcadeDrive(0.5, 0.0); 
-     }else {
-      m_robotDrive.stopMotor();
-     }
    }else if (match.color == kRedTarget){
      colorString = "Red";
     // m_robotDrive.stopMotor();
      booleanRed = true;
-     if (egg != "Red"){
-      m_robotDrive.arcadeDrive(0.5, 0.0); 
-     }else {
-      m_robotDrive.stopMotor();
-     }
+     
    }else if (match.color == kGreenTarget){
      //m_robotDrive.arcadeDrive(0.5, 0.0); 
      colorString = "Green";
      booleanGreen = true;   
-     if (egg != "Green"){
-      m_robotDrive.arcadeDrive(0.5, 0.0); 
-     }else {
-      m_robotDrive.stopMotor();
-     }
+
     }
    else if (match.color == kYellowTarget){
     // m_robotDrive.stopMotor();
      colorString = "Yellow";
      booleanYellow = true;   
-     if (egg != "Yellow"){
-      m_robotDrive.arcadeDrive(0.5, 0.0); 
-     }else {
-      m_robotDrive.stopMotor();
-     }
+     
     }
    else {
      colorString = "unknown";
    }
-} else {
-  m_robotDrive.stopMotor(); // stop robot
-}
+
  SmartDashboard.putBoolean("isRed", booleanRed);
  SmartDashboard.putBoolean("isBlue", booleanBlue);
  SmartDashboard.putBoolean("isYellow", booleanYellow);
- SmartDashboard.putBoolean("isGreen", booleanGreen);
+ SmartDashboard.putBoolean("isGreen", booleanGreen);*/
   }
   
 
@@ -289,7 +274,7 @@ if (m_stick.getXButtonPressed()) {
    */
   @Override
   public void autonomousInit() {
-    m_encoder.reset();
+    //m_encoder.reset();
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
     // schedule the autonomous command (example)
@@ -304,18 +289,18 @@ if (m_stick.getXButtonPressed()) {
   @Override
   public void autonomousPeriodic() {
 
-    System.out.print("distance: "+m_encoder.getDistance());
+  //  System.out.print("distance: "+m_encoder.getDistance());
    // Drive for 2 seconds
   // if (m_timer.get() < 2.0) {
-    if (m_encoder.getDistance() < desiredDistance) {
-      m_robotDrive.arcadeDrive(0.5, 0.0);
-    }
+   // if (m_encoder.getDistance() < desiredDistance) {
+     //m_robotDrive.arcadeDrive(0.5, 0.0);
+    //}
     /*
     if(){
     m_robotDrive.arcadeDrive(0.5, 0.0); // drive forwards half speed
-    } */ else {
-    m_robotDrive.stopMotor(); // stop robot
-  }
+    }  else {
+  //  m_robotDrive.stopMotor(); // stop robot
+  }*/
   }
 
   @Override
@@ -342,7 +327,7 @@ if (m_stick.getXButtonPressed()) {
        yEntry.setDouble(y);
        x += 0.05;
        y += 1.0;
-    m_robotDrive.arcadeDrive(m_stick.getY(), m_stick.getX());
+    //m_robotDrive.arcadeDrive(m_stick.getY(), m_stick.getX());
    
     /*
         if (m_stick.getYButton()) {
