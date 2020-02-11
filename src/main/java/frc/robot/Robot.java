@@ -365,7 +365,7 @@ if (m_stick.getXButtonPressed()) {
        m_BottomIntakeMotor1.set(0);
       // stop motor
     }
-    if (m_stick.getYButton()) {
+    if (m_stick.getXButton()) {
       m_BottomIntakeMotor1.set(OUTTAKE_SPEED);
        } else {
        m_BottomIntakeMotor1.set(0);
