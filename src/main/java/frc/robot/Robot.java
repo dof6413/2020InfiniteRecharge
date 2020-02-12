@@ -8,7 +8,7 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.XboxController;
-import com.ctre.phoenix.motorcontrol.can.ControlMode;
+//import com.ctre.phoenix.motorcontrol.can.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -39,6 +39,10 @@ import edu.wpi.first.networktables.NetworkTableInstance;
  * project.
  */
 public class Robot extends TimedRobot {
+  private final double INTAKE_SPEED = -0.25;
+  private final double OUTTAKE_SPEED = .5;
+  private final double TOPOUTTAKE_SPEED = 1;
+  private final double TOPINTAKE_SPEED = -0.5;
   double desiredDistance = 120;
   NetworkTableEntry xEntry;
   NetworkTableEntry yEntry;
@@ -93,8 +97,7 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotInit() {
-    private final double INTAKE_SPEED = -0.5;
-    private final double OUTTAKE_SPEED = 1.0;
+
      //Get the default instance of NetworkTables that was created automatically
        //when your program starts
        NetworkTableInstance inst = NetworkTableInstance.getDefault();
@@ -111,9 +114,9 @@ public class Robot extends TimedRobot {
     m_rightfollow.follow(m_rightMotor);
     
       m_BottomIntakeMotor2.follow(m_BottomIntakeMotor1);
-      m_TopIntakeMotor.follow(m_BottomIntakeMotor1);
+      
     
-    m_bottomIntakeMotor1.set(ControlMode.PercentOutput, 0);
+    
       
     m_encoder = new Encoder(kEncoderPortA, kEncoderPortB);
     m_encoder2 = new Encoder(kEncoderPortC, kEncoderPortD);
@@ -146,6 +149,7 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotPeriodic() {
+
     SmartDashboard.putNumber("Encoder", m_encoder.getDistance());
     SmartDashboard.putNumber("Encoder2", m_encoder2.getDistance());
     // Runs the Scheduler.  This is responsible for polling buttons, adding newly-scheduled
@@ -359,18 +363,21 @@ if (m_stick.getXButtonPressed()) {
        y += 1.0;
     m_robotDrive.arcadeDrive(m_stick.getY(), m_stick.getX());
     
-     if (m_stick.getYButton()) {
-      m_BottomIntakeMotor1.set(INTAKE_SPEED);
-       } else {
-       m_BottomIntakeMotor1.set(0);
-      // stop motor
-    }
+     
+      
+     
     if (m_stick.getXButton()) {
       m_BottomIntakeMotor1.set(OUTTAKE_SPEED);
-       } else {
-       m_BottomIntakeMotor1.set(0);
+      m_TopIntakeMotor.set(TOPOUTTAKE_SPEED);
+       } 
+       else if (m_stick.getYButton()){
+        m_BottomIntakeMotor1.set(INTAKE_SPEED);
+        m_TopIntakeMotor.set(TOPINTAKE_SPEED);
       // stop motor
-    }
+    }else {
+      m_BottomIntakeMotor1.set(0);
+     // stop motor
+   }
     /*
         if (m_stick.getYButton()) {
       m_robotDrive.arcadeDrive(0.5, 0.0); // drive forwards half speed
