@@ -42,7 +42,7 @@ public class Robot extends TimedRobot {
   private final double INTAKE_SPEED = -0.25;
   private final double OUTTAKE_SPEED = .5;
   private final double TOPOUTTAKE_SPEED = 1;
-  private final double TOPINTAKE_SPEED = -0.5;
+  private final double TOPINTAKE_SPEED = -1;
   double desiredDistance = 120;
   NetworkTableEntry xEntry;
   NetworkTableEntry yEntry;
