@@ -39,6 +39,10 @@ import frc.robot.subsystems.WheelOfFortune;
  * project.
  */
 public class Robot extends TimedRobot {
+<<<<<<< Updated upstream
+=======
+
+>>>>>>> Stashed changes
   double desiredDistance = 120;
   NetworkTableEntry xEntry;
   NetworkTableEntry yEntry;
@@ -55,11 +59,16 @@ public class Robot extends TimedRobot {
     private final WPI_VictorSPX m_rightMotor = new WPI_VictorSPX(3);
     private final WPI_VictorSPX m_leftfollow = new WPI_VictorSPX(2);
     private final WPI_VictorSPX m_rightfollow = new WPI_VictorSPX(4);
+<<<<<<< Updated upstream
+=======
+  
+>>>>>>> Stashed changes
     private final DifferentialDrive m_robotDrive = new DifferentialDrive(m_leftMotor, m_rightMotor);
     private final XboxController m_stick = new XboxController(0);*/
 /**
    * Change the I2C port below to match the connection of your color sensor
    */
+<<<<<<< Updated upstream
    // private final I2C.Port i2cPort = I2C.Port.kOnboard;
   /**
    * A Rev Color Sensor V3 object is constructed with an I2C port as a 
@@ -86,6 +95,13 @@ public class Robot extends TimedRobot {
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
    */
+=======
+    
+    private final Timer m_timer = new Timer();
+    private RobotContainer m_robotContainer;
+
+  
+>>>>>>> Stashed changes
   @Override
   public void robotInit() {
      //Get the default instance of NetworkTables that was created automatically
@@ -100,10 +116,23 @@ public class Robot extends TimedRobot {
        //for some operation in your program.
        xEntry = table.getEntry("X");
        yEntry = table.getEntry("Y");
+<<<<<<< Updated upstream
     ///m_leftfollow.follow(m_leftMotor);
     //m_rightfollow.follow(m_rightMotor);
    // m_encoder = new Encoder(kEncoderPortA, kEncoderPortB);
    // m_encoder2 = new Encoder(kEncoderPortC, kEncoderPortD);
+=======
+    m_leftfollow.follow(m_leftMotor);
+    m_rightfollow.follow(m_rightMotor);
+    
+    //  m_BottomIntakeMotor2.follow(m_BottomIntakeMotor1);
+      
+    
+    
+      
+    m_encoder = new Encoder(kEncoderPortA, kEncoderPortB);
+    m_encoder2 = new Encoder(kEncoderPortC, kEncoderPortD);
+>>>>>>> Stashed changes
 
     // Use SetDistancePerPulse to set the multiplier for GetDistance
     // This is set up assuming a 6 inch wheel with a 360 CPR encoder.
@@ -113,12 +142,18 @@ public class Robot extends TimedRobot {
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
+<<<<<<< Updated upstream
 /*
     m_colorMatcher.addColorMatch(kBlueTarget);
     m_colorMatcher.addColorMatch(kGreenTarget);
     m_colorMatcher.addColorMatch(kRedTarget);
     m_colorMatcher.addColorMatch(kYellowTarget);    
 */
+=======
+
+ 
+
+>>>>>>> Stashed changes
  
   }
   double x = 0;
@@ -141,6 +176,7 @@ public class Robot extends TimedRobot {
     // block in order for anything in the Command-based framework to work.
     CommandScheduler.getInstance().run();
 
+<<<<<<< Updated upstream
         /**
      * The method GetColor() returns a normalized color value from the sensor and can be
      * useful if outputting the color to an RGB LED or similar. To
@@ -255,6 +291,12 @@ if(gameData.length() > 0)
  SmartDashboard.putBoolean("isBlue", booleanBlue);
  SmartDashboard.putBoolean("isYellow", booleanYellow);
  SmartDashboard.putBoolean("isGreen", booleanGreen);*/
+=======
+        
+    
+
+    
+>>>>>>> Stashed changes
   }
   
 
@@ -292,6 +334,7 @@ if(gameData.length() > 0)
   //  System.out.print("distance: "+m_encoder.getDistance());
    // Drive for 2 seconds
   // if (m_timer.get() < 2.0) {
+<<<<<<< Updated upstream
    // if (m_encoder.getDistance() < desiredDistance) {
      //m_robotDrive.arcadeDrive(0.5, 0.0);
     //}
@@ -301,6 +344,14 @@ if(gameData.length() > 0)
     }  else {
   //  m_robotDrive.stopMotor(); // stop robot
   }*/
+=======
+    if (m_encoder.getDistance() < desiredDistance) {
+      m_robotDrive.arcadeDrive(0.5, 0.0);
+    }
+     else {
+    m_robotDrive.stopMotor(); // stop robot
+  }
+>>>>>>> Stashed changes
   }
 
   @Override
@@ -327,6 +378,7 @@ if(gameData.length() > 0)
        yEntry.setDouble(y);
        x += 0.05;
        y += 1.0;
+<<<<<<< Updated upstream
     //m_robotDrive.arcadeDrive(m_stick.getY(), m_stick.getX());
    
     /*
@@ -336,6 +388,13 @@ if(gameData.length() > 0)
       m_robotDrive.stopMotor(); // stop robot
     }*/
   }
+=======
+    m_robotDrive.arcadeDrive(m_stick.getY(), m_stick.getX());
+    
+     
+      
+    }
+>>>>>>> Stashed changes
 
   @Override
   public void testInit() {
