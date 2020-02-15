@@ -7,6 +7,7 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.XboxController;
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -37,24 +38,46 @@ import edu.wpi.first.networktables.NetworkTableInstance;
  * project.
  */
 public class Robot extends TimedRobot {
+<<<<<<< Updated upstream
   double desiredDistance = 120;
+=======
+  private final double INTAKE_SPEED = -0.25;
+  private final double OUTTAKE_SPEED = .5;
+  private final double TOPOUTTAKE_SPEED = 1;
+  private final double TOPINTAKE_SPEED = -1;
+  double desiredDistance = 84;
+>>>>>>> Stashed changes
   NetworkTableEntry xEntry;
   NetworkTableEntry yEntry;
   private static final int kEncoderPortA = 0;
   private static final int kEncoderPortB = 1;
-  private Encoder m_encoder;
+  private Encoder m_encoderleft;
   private static final int kEncoderPortC = 2;
   private static final int kEncoderPortD = 3;
-  private Encoder m_encoder2;
+  private Encoder m_encoderright;
   private Command m_autonomousCommand;
   // private final DifferentialDrive m_robotDrive = new DifferentialDrive(new WPI_VictorSPX(3), new WPI_VictorSPX(4));
     // drive motors
+<<<<<<< Updated upstream
     private final WPI_VictorSPX m_leftMotor = new WPI_VictorSPX(5);
     private final WPI_VictorSPX m_rightMotor = new WPI_VictorSPX(3);
     private final WPI_VictorSPX m_leftfollow = new WPI_VictorSPX(2);
     private final WPI_VictorSPX m_rightfollow = new WPI_VictorSPX(4);
+=======
+    private WPI_VictorSPX m_leftMotor = new WPI_VictorSPX(5);
+    private WPI_VictorSPX m_rightMotor = new WPI_VictorSPX(3);
+    private WPI_VictorSPX m_leftfollow = new WPI_VictorSPX(2);
+    private WPI_VictorSPX m_rightfollow = new WPI_VictorSPX(4);
+  
+    private WPI_TalonSRX m_BottomIntakeMotor1 = new WPI_TalonSRX(7);
+    private WPI_TalonSRX m_BottomIntakeMotor2 = new WPI_TalonSRX(8);
+    private WPI_TalonSRX m_TopIntakeMotor = new WPI_TalonSRX(6);
+>>>>>>> Stashed changes
     private final DifferentialDrive m_robotDrive = new DifferentialDrive(m_leftMotor, m_rightMotor);
-    private final XboxController m_stick = new XboxController(0);
+
+
+    private final XboxController m_driverController = new XboxController(0);
+
 /**
    * Change the I2C port below to match the connection of your color sensor
    */
@@ -86,6 +109,11 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotInit() {
+<<<<<<< Updated upstream
+=======
+   
+
+>>>>>>> Stashed changes
      //Get the default instance of NetworkTables that was created automatically
        //when your program starts
        NetworkTableInstance inst = NetworkTableInstance.getDefault();
@@ -100,14 +128,25 @@ public class Robot extends TimedRobot {
        yEntry = table.getEntry("Y");
     m_leftfollow.follow(m_leftMotor);
     m_rightfollow.follow(m_rightMotor);
+<<<<<<< Updated upstream
     m_encoder = new Encoder(kEncoderPortA, kEncoderPortB);
     m_encoder2 = new Encoder(kEncoderPortC, kEncoderPortD);
+=======
+    
+      m_BottomIntakeMotor2.follow(m_BottomIntakeMotor1);
+      
+    
+    
+      
+    m_encoderleft = new Encoder(kEncoderPortA, kEncoderPortB);
+    m_encoderright = new Encoder(kEncoderPortC, kEncoderPortD);
+>>>>>>> Stashed changes
 
     // Use SetDistancePerPulse to set the multiplier for GetDistance
     // This is set up assuming a 6 inch wheel with a 360 CPR encoder.
 
-    m_encoder.setDistancePerPulse((Math.PI * 6) / 360.0);
-    m_encoder2.setDistancePerPulse((Math.PI * 6) / 360.0);  
+    m_encoderleft.setDistancePerPulse((Math.PI * 6) / 360.0);
+    m_encoderright.setDistancePerPulse((Math.PI * 6) / 360.0);  
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
@@ -131,8 +170,14 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotPeriodic() {
+<<<<<<< Updated upstream
     SmartDashboard.putNumber("Encoder", m_encoder.getDistance());
     SmartDashboard.putNumber("Encoder2", m_encoder2.getDistance());
+=======
+
+    SmartDashboard.putNumber("Encoderleft", m_encoderleft.getDistance());
+    SmartDashboard.putNumber("Encoderright", m_encoderright.getDistance());
+>>>>>>> Stashed changes
     // Runs the Scheduler.  This is responsible for polling buttons, adding newly-scheduled
     // commands, running already-scheduled commands, removing finished or interrupted commands,
     // and running subsystem periodic() methods.  This must be called from the robot's periodic
@@ -220,7 +265,7 @@ if(gameData.length() > 0)
 } else {
   //Code for no data received yet
 }
-if (m_stick.getXButtonPressed()) {
+if (m_driverController.getXButtonPressed()) {
   // drive forwards half speed
   if (match.color == kBlueTarget){
     // m_robotDrive.arcadeDrive(0.5, 0.0); 
@@ -289,7 +334,7 @@ if (m_stick.getXButtonPressed()) {
    */
   @Override
   public void autonomousInit() {
-    m_encoder.reset();
+    m_encoderleft.reset();
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
     // schedule the autonomous command (example)
@@ -304,17 +349,26 @@ if (m_stick.getXButtonPressed()) {
   @Override
   public void autonomousPeriodic() {
 
-    System.out.print("distance: "+m_encoder.getDistance());
+    System.out.print("distance: "+m_encoderright.getDistance());
    // Drive for 2 seconds
   // if (m_timer.get() < 2.0) {
-    if (m_encoder.getDistance() < desiredDistance) {
+    if (m_encoderright.getDistance() < desiredDistance) {
       m_robotDrive.arcadeDrive(0.5, 0.0);
     }
     /*
     if(){
     m_robotDrive.arcadeDrive(0.5, 0.0); // drive forwards half speed
-    } */ else {
+    } */
+    else if (m_encoderright.getDistance() > desiredDistance || m_encoderright.getDistance() == desiredDistance)
+    {
+      m_robotDrive.stopMotor();
+      m_BottomIntakeMotor1.set(OUTTAKE_SPEED);
+      m_TopIntakeMotor.set(TOPOUTTAKE_SPEED);
+    }
+    else{
     m_robotDrive.stopMotor(); // stop robot
+    m_BottomIntakeMotor1.set(0);
+    m_TopIntakeMotor.set(0);
   }
   }
 
@@ -342,8 +396,37 @@ if (m_stick.getXButtonPressed()) {
        yEntry.setDouble(y);
        x += 0.05;
        y += 1.0;
+<<<<<<< Updated upstream
     m_robotDrive.arcadeDrive(m_stick.getY(), m_stick.getX());
    
+=======
+   //m_robotDrive.arcadeDrive(m_stick.getY(), m_stick.getX());
+ //  m_robotDrive.arcadeDrive(m_driverController.getY(), m_driverController.getX());
+ //m_leftMotor.set(m_driverController.getY(Hand.kLeft, left));
+ //x=m_leftMotor.set(getRawAxis(1));
+ System.out.println("raw axis: "+m_driverController.getRawAxis(1));
+ //m_rightMotor.set( m_driverController.getY()));
+ System.out.println("gety: "+m_driverController.getY());
+/*
+   System.out.println("joystick val Y: " + m_driverController.getY());     
+   System.out.println("joystick val X: " + m_driverController.getX());     */ 
+ 
+
+    if (m_driverController.getXButton()) {
+      m_BottomIntakeMotor1.set(OUTTAKE_SPEED);
+      m_TopIntakeMotor.set(TOPOUTTAKE_SPEED);
+
+       } 
+       else if (m_driverController.getYButton()){
+        m_BottomIntakeMotor1.set(INTAKE_SPEED);
+        m_TopIntakeMotor.set(TOPINTAKE_SPEED);
+      // stop motor
+    }else {
+      m_BottomIntakeMotor1.set(0);
+      m_TopIntakeMotor.set(0);
+     // stop motor
+   }
+>>>>>>> Stashed changes
     /*
         if (m_stick.getYButton()) {
       m_robotDrive.arcadeDrive(0.5, 0.0); // drive forwards half speed
@@ -363,5 +446,6 @@ if (m_stick.getXButtonPressed()) {
    */
   @Override
   public void testPeriodic() {
+
   }
 }
