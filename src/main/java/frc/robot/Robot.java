@@ -8,6 +8,7 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.GenericHID.Hand;
 //import com.ctre.phoenix.motorcontrol.can.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
@@ -246,27 +247,27 @@ if (m_stick.getXButtonPressed()) {
      colorString = "Blue";
      booleanBlue =true;
      if (egg != "Blue"){
-      m_robotDrive.arcadeDrive(0.5, 0.0); 
+  //    m_robotDrive.arcadeDrive(0.5, 0.0); 
      }else {
-      m_robotDrive.stopMotor();
+  //    m_robotDrive.stopMotor();
      }
    }else if (match.color == kRedTarget){
      colorString = "Red";
     // m_robotDrive.stopMotor();
      booleanRed = true;
      if (egg != "Red"){
-      m_robotDrive.arcadeDrive(0.5, 0.0); 
+    //  m_robotDrive.arcadeDrive(0.5, 0.0); 
      }else {
-      m_robotDrive.stopMotor();
+    //  m_robotDrive.stopMotor();
      }
    }else if (match.color == kGreenTarget){
      //m_robotDrive.arcadeDrive(0.5, 0.0); 
      colorString = "Green";
      booleanGreen = true;   
      if (egg != "Green"){
-      m_robotDrive.arcadeDrive(0.5, 0.0); 
+   //   m_robotDrive.arcadeDrive(0.5, 0.0); 
      }else {
-      m_robotDrive.stopMotor();
+   //   m_robotDrive.stopMotor();
      }
     }
    else if (match.color == kYellowTarget){
@@ -274,16 +275,16 @@ if (m_stick.getXButtonPressed()) {
      colorString = "Yellow";
      booleanYellow = true;   
      if (egg != "Yellow"){
-      m_robotDrive.arcadeDrive(0.5, 0.0); 
+   //   m_robotDrive.arcadeDrive(0.5, 0.0); 
      }else {
-      m_robotDrive.stopMotor();
+     // m_robotDrive.stopMotor();
      }
     }
    else {
      colorString = "unknown";
    }
 } else {
-  m_robotDrive.stopMotor(); // stop robot
+  //m_robotDrive.stopMotor(); // stop robot
 }
  SmartDashboard.putBoolean("isRed", booleanRed);
  SmartDashboard.putBoolean("isBlue", booleanBlue);
@@ -361,8 +362,8 @@ if (m_stick.getXButtonPressed()) {
        yEntry.setDouble(y);
        x += 0.05;
        y += 1.0;
-    m_robotDrive.arcadeDrive(m_stick.getY(), m_stick.getX());
-    
+   // m_robotDrive.arcadeDrive(-m_stick.getY(), m_stick.getX());
+    m_robotDrive.tankDrive(m_stick.getY(Hand.kRight), m_stick.getY(Hand.kLeft));
      
       
      
@@ -376,6 +377,7 @@ if (m_stick.getXButtonPressed()) {
       // stop motor
     }else {
       m_BottomIntakeMotor1.set(0);
+      m_TopIntakeMotor.set(0);
      // stop motor
    }
     /*
