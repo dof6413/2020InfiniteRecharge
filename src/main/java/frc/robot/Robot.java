@@ -8,6 +8,7 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
 //import com.ctre.phoenix.motorcontrol.can.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
@@ -44,7 +45,8 @@ public class Robot extends TimedRobot {
   private final double OUTTAKE_SPEED = .5;
   private final double TOPOUTTAKE_SPEED = 1;
   private final double TOPINTAKE_SPEED = -1;
-  double desiredDistance = 120;
+ // private final double
+  double desiredDistance = 95;
   NetworkTableEntry xEntry;
   NetworkTableEntry yEntry;
   private static final int kEncoderPortA = 0;
@@ -67,6 +69,8 @@ public class Robot extends TimedRobot {
   
     private final DifferentialDrive m_robotDrive = new DifferentialDrive(m_leftMotor, m_rightMotor);
     private final XboxController m_stick = new XboxController(0);
+    private final Joystick m_Extreme1 = new Joystick(1);
+    private final Joystick  m_Extreme2 = new Joystick(2);
 /**
    * Change the I2C port below to match the connection of your color sensor
    */
@@ -81,6 +85,8 @@ public class Robot extends TimedRobot {
  // public static class ColorSensorV3.RawColor
     private final ColorMatch m_colorMatcher = new ColorMatch();
     private final Timer m_timer = new Timer();
+  private final double athenatime = m_timer.get();
+
     private RobotContainer m_robotContainer;
 
    /**
@@ -130,6 +136,7 @@ public class Robot extends TimedRobot {
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
+    m_encoder.reset();
 
     m_colorMatcher.addColorMatch(kBlueTarget);
     m_colorMatcher.addColorMatch(kGreenTarget);
@@ -327,15 +334,27 @@ if (m_stick.getXButtonPressed()) {
     System.out.print("distance: "+m_encoder.getDistance());
    // Drive for 2 seconds
   // if (m_timer.get() < 2.0) {
+    m_timer.start();
+
     if (m_encoder.getDistance() < desiredDistance) {
       m_robotDrive.arcadeDrive(0.5, 0.0);
+      if(athenatime > 5.0){
+        m_robotDrive.stopMotor(); // stop robot
+        m_BottomIntakeMotor1.set(OUTTAKE_SPEED);
+        m_TopIntakeMotor.set(TOPOUTTAKE_SPEED);
     }
-    /*
+  }
+  else{
+    m_robotDrive.stopMotor();
+    m_BottomIntakeMotor1.set(OUTTAKE_SPEED);
+    m_TopIntakeMotor.set(TOPOUTTAKE_SPEED);
+  }
+   /*
     if(){
     m_robotDrive.arcadeDrive(0.5, 0.0); // drive forwards half speed
-    } */ else {
-    m_robotDrive.stopMotor(); // stop robot
-  }
+    } */
+    
+    //else if (m_encoder.getDistance() == desiredDistance || m_timer.get() > 2.0) {
   }
 
   @Override
@@ -344,6 +363,7 @@ if (m_stick.getXButtonPressed()) {
     // teleop starts running. If you want the autonomous to
     // continue until interrupted by another command, remove
     // this line or comment it out.
+    
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
@@ -362,16 +382,24 @@ if (m_stick.getXButtonPressed()) {
        yEntry.setDouble(y);
        x += 0.05;
        y += 1.0;
-   // m_robotDrive.arcadeDrive(-m_stick.getY(), m_stick.getX());
-    m_robotDrive.tankDrive(m_stick.getY(Hand.kRight), m_stick.getY(Hand.kLeft));
-     
-      
-     
-    if (m_stick.getXButton()) {
+   
+  
+  /********** THIS IS THE TWO JOYSTICK TANK DRIVE
+     m_robotDrive.tankDrive(-m_Extreme1.getY(Hand.kRight), -m_Extreme2.getY(Hand.kLeft));
+     ******/
+
+    /* THIS IS THE XBOX CONTROLLER TANK DRIVE*/
+    // m_robotDrive.tankDrive(-m_stick.getY(Hand.kRight), -m_stick.getY(Hand.kLeft));
+
+     /* THIS IS THE XBOX CONTROLLER ARCADE DRIVE */
+     m_robotDrive.arcadeDrive(-m_stick.getY(Hand.kLeft), m_stick.getX(Hand.kRight));
+
+
+     if (m_Extreme1.getTrigger()) {
       m_BottomIntakeMotor1.set(OUTTAKE_SPEED);
       m_TopIntakeMotor.set(TOPOUTTAKE_SPEED);
        } 
-       else if (m_stick.getYButton()){
+       else if (m_Extreme2.getTrigger()){
         m_BottomIntakeMotor1.set(INTAKE_SPEED);
         m_TopIntakeMotor.set(TOPINTAKE_SPEED);
       // stop motor
@@ -380,6 +408,20 @@ if (m_stick.getXButtonPressed()) {
       m_TopIntakeMotor.set(0);
      // stop motor
    }
+    /******** THIS IS THE XBOXCONTROLLER THING FOR INTAKE YEA
+     *     if (m_stick.getYButton()) {
+      m_BottomIntakeMotor1.set(OUTTAKE_SPEED);
+      m_TopIntakeMotor.set(TOPOUTTAKE_SPEED);
+       } 
+       else if (m_stick.getAButton()){
+        m_BottomIntakeMotor1.set(INTAKE_SPEED);
+        m_TopIntakeMotor.set(TOPINTAKE_SPEED);
+      // stop motor
+    }else {
+      m_BottomIntakeMotor1.set(0);
+      m_TopIntakeMotor.set(0);
+     // stop motor
+   }*/
     /*
         if (m_stick.getYButton()) {
       m_robotDrive.arcadeDrive(0.5, 0.0); // drive forwards half speed
