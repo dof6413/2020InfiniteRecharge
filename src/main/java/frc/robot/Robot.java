@@ -8,6 +8,8 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
 //import com.ctre.phoenix.motorcontrol.can.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
@@ -16,6 +18,7 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.subsystems.ExampleSubsystem;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.I2C;
@@ -30,8 +33,12 @@ import com.revrobotics.ColorMatch;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
-
+import edu.wpi.first.wpilibj.PWM;
+import edu.wpi.first.wpilibj.Servo;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 //import frc.robot.Constants;
+
+import frc.robot.subsystems.*;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -40,11 +47,14 @@ import edu.wpi.first.networktables.NetworkTableInstance;
  * project.
  */
 public class Robot extends TimedRobot {
+  private final Servo beakActuator = new Servo(0); 
   private final double INTAKE_SPEED = -0.25;
   private final double OUTTAKE_SPEED = .5;
   private final double TOPOUTTAKE_SPEED = 1;
   private final double TOPINTAKE_SPEED = -1;
-  double desiredDistance = 120;
+  private final double Flaco_SPEED = -1 ;
+ // private final double
+  double desiredDistance = 95;
   NetworkTableEntry xEntry;
   NetworkTableEntry yEntry;
   private static final int kEncoderPortA = 0;
@@ -55,7 +65,7 @@ public class Robot extends TimedRobot {
   private Encoder m_encoder2;
   private Command m_autonomousCommand;
   // private final DifferentialDrive m_robotDrive = new DifferentialDrive(new WPI_VictorSPX(3), new WPI_VictorSPX(4));
-    // drive motors
+  // drive motors
     private final WPI_VictorSPX m_leftMotor = new WPI_VictorSPX(5);
     private final WPI_VictorSPX m_rightMotor = new WPI_VictorSPX(3);
     private final WPI_VictorSPX m_leftfollow = new WPI_VictorSPX(2);
@@ -64,41 +74,58 @@ public class Robot extends TimedRobot {
     private final WPI_TalonSRX m_BottomIntakeMotor1 = new WPI_TalonSRX(7);
     private final WPI_TalonSRX m_BottomIntakeMotor2 = new WPI_TalonSRX(8);
     private final WPI_TalonSRX m_TopIntakeMotor = new WPI_TalonSRX(6);
+    private final WPI_TalonSRX m_Pwnf = new WPI_TalonSRX(9);
   
     private final DifferentialDrive m_robotDrive = new DifferentialDrive(m_leftMotor, m_rightMotor);
     private final XboxController m_stick = new XboxController(0);
-/**
-   * Change the I2C port below to match the connection of your color sensor
-   */
+    private final Joystick m_Extreme1 = new Joystick(1);
+    private final Joystick  m_Extreme2 = new Joystick(2);
+    /**
+     * Change the I2C port below to match the connection of your color sensor
+     */
     private final I2C.Port i2cPort = I2C.Port.kOnboard;
-  /**
-   * A Rev Color Sensor V3 object is constructed with an I2C port as a 
-   * parameter. The device will be automatically initialized with default 
-   * parameters.
-   */
+    /**
+     * A Rev Color Sensor V3 object is constructed with an I2C port as a 
+     * parameter. The device will be automatically initialized with default 
+     * parameters.
+     */
     private final ColorSensorV3 m_colorSensor = new ColorSensorV3(i2cPort);
   
- // public static class ColorSensorV3.RawColor
+    // public static class ColorSensorV3.RawColor
     private final ColorMatch m_colorMatcher = new ColorMatch();
     private final Timer m_timer = new Timer();
+    private final double athenatime = m_timer.get();
+
     private RobotContainer m_robotContainer;
 
-   /**
-  * Note: Any example colors should be calibrated as the user needs, these
-  * are here as a basic example.
-  */
+    /**
+    * Note: Any example colors should be calibrated as the user needs, these
+    * are here as a basic example.
+    */
     private final Color kBlueTarget = ColorMatch.makeColor(0.143, 0.427, 0.429);
     private final Color kGreenTarget = ColorMatch.makeColor(0.197, 0.561, 0.240);
     private final Color kRedTarget = ColorMatch.makeColor(0.561, 0.232, 0.114);
     private final Color kYellowTarget = ColorMatch.makeColor(0.361, 0.524, 0.113);
+    private SendableChooser<Command> chooser = new SendableChooser<>();
 
     /**
-   * This function is run when the robot is first started up and should be used for any
-   * initialization code.
-   */
+     * This function is run when the robot is first started up and should be used for any
+     * initialization code.
+     */
+
   @Override
   public void robotInit() {
+    //chooser.addDefault("Right", new RobotDrive());
+    chooser.setDefaultOption("Right", m_autonomousCommand);
+    /*chooser.addOption("Left", new AutoLeft());
+    
+    chooser.addObject("Left OOW", new AutoLeftOutOfWay());
+    chooser.addObject("Center", new AutoCenter());
+    chooser.addObject("Cross the Line", new AutoCrossTheLine());*/
+  
+    SmartDashboard.putData("Auto mode", chooser);
 
+    CameraServer.getInstance().startAutomaticCapture();
      //Get the default instance of NetworkTables that was created automatically
        //when your program starts
        NetworkTableInstance inst = NetworkTableInstance.getDefault();
@@ -130,11 +157,13 @@ public class Robot extends TimedRobot {
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
+    m_encoder.reset();
 
     m_colorMatcher.addColorMatch(kBlueTarget);
     m_colorMatcher.addColorMatch(kGreenTarget);
     m_colorMatcher.addColorMatch(kRedTarget);
     m_colorMatcher.addColorMatch(kYellowTarget);    
+
 
  
   }
@@ -170,14 +199,14 @@ public class Robot extends TimedRobot {
      * measurements and make it difficult to accurately determine its color.
      */
     String colorString;
-    Color detectedColor = m_colorSensor.getColor();
-    RawColor detectedRawColor = m_colorSensor.getRawColor();
-    ColorMatchResult match = m_colorMatcher.matchClosestColor(detectedColor);
+    final Color detectedColor = m_colorSensor.getColor();
+    final RawColor detectedRawColor = m_colorSensor.getRawColor();
+    final ColorMatchResult match = m_colorMatcher.matchClosestColor(detectedColor);
 
     /**
      * The sensor returns a raw IR value of the infrared light detected.
      */
-    double IR = m_colorSensor.getIR();
+    final double IR = m_colorSensor.getIR();
 
     /**
      * Open Smart Dashboard or Shuffleboard to see the color detected by the 
@@ -202,7 +231,7 @@ public class Robot extends TimedRobot {
      * or provide a threshold for when an object is close enough to provide
      * accurate color values.
      */
-    int proximity = m_colorSensor.getProximity();
+    final int proximity = m_colorSensor.getProximity();
 
     SmartDashboard.putNumber("Proximity", proximity);
     String egg;
@@ -292,7 +321,6 @@ if (m_stick.getXButtonPressed()) {
  SmartDashboard.putBoolean("isGreen", booleanGreen);
   }
   
-
   /**
    * This function is called once each time the robot enters Disabled mode.
    */
@@ -309,6 +337,7 @@ if (m_stick.getXButtonPressed()) {
    */
   @Override
   public void autonomousInit() {
+    m_timer.start();
     m_encoder.reset();
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
@@ -321,22 +350,83 @@ if (m_stick.getXButtonPressed()) {
   /**
    * This function is called periodically during autonomous.
    */
-  @Override
+ //START AUTO
+   @Override
   public void autonomousPeriodic() {
 
-    System.out.print("distance: "+m_encoder.getDistance());
+    //System.out.println("distance: "+m_encoder.getDistance());
    // Drive for 2 seconds
   // if (m_timer.get() < 2.0) {
+
+/*
     if (m_encoder.getDistance() < desiredDistance) {
       m_robotDrive.arcadeDrive(0.5, 0.0);
+      if(athenatime > 5.0){
+        m_robotDrive.stopMotor(); // stop robot
+        m_BottomIntakeMotor1.set(OUTTAKE_SPEED);
+        m_TopIntakeMotor.set(TOPOUTTAKE_SPEED);
     }
-    /*
-    if(){
-    m_robotDrive.arcadeDrive(0.5, 0.0); // drive forwards half speed
-    } */ else {
-    m_robotDrive.stopMotor(); // stop robot
   }
-  }
+  else{
+    m_robotDrive.stopMotor();
+    m_BottomIntakeMotor1.set(OUTTAKE_SPEED);
+    m_TopIntakeMotor.set(TOPOUTTAKE_SPEED);
+  }*/
+   // while (m_timer.get() <10.0){
+
+    
+    if(m_timer.get() < 4.0){
+      m_robotDrive.arcadeDrive(0.5, 0.0);// drive forward half speed 
+    }
+
+    else if (m_timer.get() > 4.0 && m_timer.get()  < 5.0 || m_timer.get()>6.0 && m_timer.get()< 7.0 || m_timer.get()>8.0 && m_timer.get()< 9.0){
+      m_robotDrive.stopMotor();
+      m_BottomIntakeMotor1.set(OUTTAKE_SPEED); // drive forwards half speed
+      m_TopIntakeMotor.set(TOPOUTTAKE_SPEED); // drive forwards half speed
+      System.out.println("distance: "+m_encoder.getDistance());
+    }
+
+    else if (m_timer.get() > 5.0 && m_timer.get()  < 6.0 ||m_timer.get() > 7.0 && m_timer.get()  < 8.0 || m_timer.get() > 8.0 && m_timer.get()  < 9.0 ){
+      m_robotDrive.stopMotor();
+      m_BottomIntakeMotor1.set(0);
+      m_TopIntakeMotor.set(0);
+    }
+   /* else if (m_timer.get()>6.0 && m_timer.get()< 7.0) {
+      m_robotDrive.stopMotor();
+      m_BottomIntakeMotor1.set(OUTTAKE_SPEED); // drive forwards half speed
+      m_TopIntakeMotor.set(TOPOUTTAKE_SPEED); // drive forwards half speed
+    }*/
+
+    else{
+      m_robotDrive.stopMotor();
+      m_BottomIntakeMotor1.set(0);
+      m_TopIntakeMotor.set(0); 
+    }
+/*
+    else if(m_timer.get() > 5.0 && m_timer.get()  < 6.0 ){
+      m_robotDrive.stopMotor();
+      System.out.println("distance: "+m_encoder.getDistance());
+    }
+    else if(m_timer.get() > 6.0 && m_timer.get()  < 8.0 ){
+      m_robotDrive.arcadeDrive(0.5, 0.0);// drive forward half speed
+
+    } 
+  
+    else if (m_timer.get() > 8.0 && m_timer.get()  < 9.0 ){
+      m_robotDrive.stopMotor();
+      System.out.println("distance: "+m_encoder.getDistance());
+    }
+    else if(m_timer.get() > 9.0 && m_timer.get()  < 10.0 ){
+      m_robotDrive.arcadeDrive(0.5, 0.0); // drive forwards half speed
+    }
+*/
+
+  //}
+
+
+    
+    //else if (m_encoder.getDistance() == desiredDistance || m_timer.get() > 2.0) {
+  } //END AUTO
 
   @Override
   public void teleopInit() {
@@ -344,6 +434,7 @@ if (m_stick.getXButtonPressed()) {
     // teleop starts running. If you want the autonomous to
     // continue until interrupted by another command, remove
     // this line or comment it out.
+    
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
@@ -362,16 +453,37 @@ if (m_stick.getXButtonPressed()) {
        yEntry.setDouble(y);
        x += 0.05;
        y += 1.0;
-   // m_robotDrive.arcadeDrive(-m_stick.getY(), m_stick.getX());
-    m_robotDrive.tankDrive(m_stick.getY(Hand.kRight), m_stick.getY(Hand.kLeft));
-     
-      
-     
-    if (m_stick.getXButton()) {
+   
+  
+  /********** THIS IS THE TWO JOYSTICK TANK DRIVE
+     m_robotDrive.tankDrive(-m_Extreme1.getY(Hand.kRight), -m_Extreme2.getY(Hand.kLeft));
+     ******/
+
+    /* THIS IS THE XBOX CONTROLLER TANK DRIVE*/
+    // m_robotDrive.tankDrive(-m_stick.getY(Hand.kRight), -m_stick.getY(Hand.kLeft));
+
+     /* THIS IS THE XBOX CONTROLLER ARCADE DRIVE */
+     m_robotDrive.arcadeDrive(-m_stick.getY(Hand.kLeft), m_stick.getX(Hand.kRight));
+
+     beakActuator.setBounds(2.0, 1.8, 1.5, 1.2, 1.0); 
+     if(m_stick.getAButton()){
+      beakActuator.setSpeed(1.0); // to open 
+     }
+    if(m_stick.getBButton()){
+      beakActuator.setSpeed(-1.0); // to close
+    }
+    if(m_stick.getXButton()){
+      m_Pwnf.set(Flaco_SPEED);
+    }
+    if(m_stick.getYButton()){
+      m_Pwnf.set(0);
+    }
+
+     if (m_Extreme1.getTrigger()) {
       m_BottomIntakeMotor1.set(OUTTAKE_SPEED);
       m_TopIntakeMotor.set(TOPOUTTAKE_SPEED);
        } 
-       else if (m_stick.getYButton()){
+       else if (m_Extreme2.getTrigger()){
         m_BottomIntakeMotor1.set(INTAKE_SPEED);
         m_TopIntakeMotor.set(TOPINTAKE_SPEED);
       // stop motor
@@ -380,6 +492,20 @@ if (m_stick.getXButtonPressed()) {
       m_TopIntakeMotor.set(0);
      // stop motor
    }
+    /******** THIS IS THE XBOXCONTROLLER THING FOR INTAKE YEA
+     *     if (m_stick.getYButton()) {
+      m_BottomIntakeMotor1.set(OUTTAKE_SPEED);
+      m_TopIntakeMotor.set(TOPOUTTAKE_SPEED);
+       } 
+       else if (m_stick.getAButton()){
+        m_BottomIntakeMotor1.set(INTAKE_SPEED);
+        m_TopIntakeMotor.set(TOPINTAKE_SPEED);
+      // stop motor
+    }else {
+      m_BottomIntakeMotor1.set(0);
+      m_TopIntakeMotor.set(0);
+     // stop motor
+   }*/
     /*
         if (m_stick.getYButton()) {
       m_robotDrive.arcadeDrive(0.5, 0.0); // drive forwards half speed
@@ -399,5 +525,9 @@ if (m_stick.getXButtonPressed()) {
    */
   @Override
   public void testPeriodic() {
+  }
+
+  public void DoNothing(){
+    m_autonomousCommand.cancel();
   }
 }
